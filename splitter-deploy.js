@@ -110,7 +110,7 @@ if (cliOptions.help) {
 
 			fs.readFile(solidityFile, function(err, result) {
 				var source = result.toString();
-				console.log('compiling',solidityFile);
+				console.log('compiling', solidityFile);
 				var output = solcV.compile(source, 1); // 1 activates the optimiser
 				var abi = JSON.parse(output.contracts[contractName].interface);
 				var bytecode = output.contracts[contractName].bytecode;
@@ -138,37 +138,43 @@ if (cliOptions.help) {
 					config.required, config.daily);
 				if (cliOptions.send_immediately) {
 					console.log('ok - lets go, deploy contract... please wait a few moments');
-					contract.new([
-							web3.toHex(config.owner1),
-							web3.toHex(config.owner2),
-							web3.toHex(config.owner3),
-							web3.toHex(config.owner4)
-						], {
-							from: config_environment.from,
-							gas: 2195665,
-							gasPrice: config_environment.gasprice,
-							data: bytecode
-						},
-						function(err, myContract) {
-							if (!err) {
-								if (myContract.address) {
-									console.log('contract deployed');
-									console.log('address = ', myContract.address);
-									var data = {
-										bytecode: bytecode,
-										abi: abi,
-										address: myContract.address
-									};
 
-									var outputFileName = __dirname + '/' + contractName + ".json";
-									console.log('saving to', outputFileName);
-									fs.writeFile(outputFileName, JSON.stringify(data), 'utf8');
+					web3.eth.getGasPrice(function(err, result) {
+						var gasPrice = result.toNumber(10);
+						console.log('gasprice=',gasPrice);
 
+						contract.new([
+								web3.toHex(config.owner1),
+								web3.toHex(config.owner2),
+								web3.toHex(config.owner3),
+								web3.toHex(config.owner4)
+							], {
+								from: config_environment.from,
+								gas: 1195665,
+								gasPrice: gasPrice,
+								data: bytecode
+							},
+							function(err, myContract) {
+								if (!err) {
+									if (myContract.address) {
+										console.log('contract deployed');
+										console.log('address = ', myContract.address);
+										var data = {
+											bytecode: bytecode,
+											abi: abi,
+											address: myContract.address
+										};
+
+										var outputFileName = __dirname + '/' + contractName + ".json";
+										console.log('saving to', outputFileName);
+										fs.writeFile(outputFileName, JSON.stringify(data), 'utf8');
+
+									}
+								} else {
+									console.log(err);
 								}
-							} else {
-								console.log(err);
-							}
-						});
+							});
+					});
 				} else {
 					console.log('not deploying now, set --send_immediately to send transaction');
 				}

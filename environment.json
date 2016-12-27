@@ -1,0 +1,7 @@
+{
+	"hostname" : "http://faucet.ma.cx:8546/",
+	"hostname__" : "http://faucet.ma.cx:8545/",
+	"hostname_": "http://localhost:8545",
+	"walletfile": "/Volumes/NAME/sponnet-mywallet.json",
+	"gasprice": 41967171804
+}
